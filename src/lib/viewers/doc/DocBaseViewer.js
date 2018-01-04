@@ -534,9 +534,16 @@ class DocBaseViewer extends BaseViewer {
         this.pdfLoadingTask = PDFJS.getDocument(docInitParams);
         return this.pdfLoadingTask
             .then((doc) => {
+
+
+                Object.defineProperty(doc, 'numPages', { value: Math.min(doc.numPages, 3) });
                 this.pdfViewer.setDocument(doc);
 
+                console.log(doc);
+                // console.log(docInitParams);
+
                 const { linkService } = this.pdfViewer;
+                console.log(linkService)
                 if (linkService instanceof PDFJS.PDFLinkService) {
                     linkService.setDocument(doc, pdfUrl);
                     linkService.setViewer(this.pdfViewer);
@@ -546,7 +553,7 @@ class DocBaseViewer extends BaseViewer {
                 /* eslint-disable no-console */
                 console.error(err);
                 /* eslint-enable no-console */
-
+    
                 // Display a generic error message but log the real one
                 const error = err;
                 if (error instanceof Error) {

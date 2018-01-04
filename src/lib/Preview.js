@@ -764,6 +764,9 @@ class Preview extends EventEmitter {
         // Prefix any user created loaders before our default ones
         this.loaders = (options.loaders || []).concat(loaderList);
 
+        // Set starting page number
+        this.options.pageNumber = options.pageNumber || 0;
+
         // Disable or enable viewers based on viewer options
         Object.keys(this.options.viewers).forEach((viewerName) => {
             const isDisabled = this.options.viewers[viewerName].disabled;
