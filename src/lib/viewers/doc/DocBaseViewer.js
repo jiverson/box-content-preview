@@ -19,7 +19,7 @@ import {
     STATUS_SUCCESS
 } from '../../constants';
 import { checkPermission, getRepresentation } from '../../file';
-import { get, createAssetUrlCreator, getMidpoint, getDistance, getClosestPageToPinch } from '../../util';
+import { get, createAssetUrlCreator, getMidpoint, getDistance, getClosestPageToPinch, getProxyUrl } from '../../util';
 import { ICON_PRINT_CHECKMARK } from '../../icons/icons';
 import { JS, CSS } from './docAssets';
 import { VIEWER_EVENT } from '../../events';
@@ -236,6 +236,10 @@ class DocBaseViewer extends BaseViewer {
 
         const template = this.options.representation.content.url_template;
         this.pdfUrl = this.createContentUrlWithAuthParams(template);
+
+        if (this.options.proxyUrl) {
+            this.pdfUrl = getProxyUrl(this.pdfUrl, this.options.proxyUrl, 'cloud');
+        }
 
         return Promise.all([this.loadAssets(JS, CSS), this.getRepStatus().getPromise()])
             .then(this.handleAssetAndRepLoad)

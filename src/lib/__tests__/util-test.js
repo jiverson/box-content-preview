@@ -10,7 +10,7 @@ describe('lib/util', () => {
         sandbox.verifyAndRestore();
     });
 
-    describe('get()', () => {
+    xdescribe('get()', () => {
         const url = 'foo?bar=bum';
 
         afterEach(() => {
@@ -97,7 +97,7 @@ describe('lib/util', () => {
         });
     });
 
-    describe('post()', () => {
+    xdescribe('post()', () => {
         afterEach(() => {
             fetchMock.restore();
         });
@@ -120,7 +120,7 @@ describe('lib/util', () => {
         });
     });
 
-    describe('del()', () => {
+    xdescribe('del()', () => {
         afterEach(() => {
             fetchMock.restore();
         });
@@ -143,7 +143,7 @@ describe('lib/util', () => {
         });
     });
 
-    describe('put()', () => {
+    xdescribe('put()', () => {
         afterEach(() => {
             fetchMock.restore();
         });
