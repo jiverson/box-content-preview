@@ -709,6 +709,9 @@ class Preview extends EventEmitter {
         // Reset all options
         this.options = {};
 
+        // Base proxy
+        this.options.proxyUrl = options.proxyUrl;
+
         // Container for preview
         this.options.container = options.container;
 

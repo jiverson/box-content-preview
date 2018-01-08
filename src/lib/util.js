@@ -71,6 +71,22 @@ function checkStatus(response) {
 }
 
 /**
+ * Helper function to proxy HTTP calls
+ *
+ * @public
+ * @param {string} base - orginal uri
+ * @param {string} url - proxy
+ * @param {string} type - optional proxy info
+ * @return {string} - modified url
+ */
+export function getProxyUrl(base, url, type = '') {
+    return new Uri(base)
+        .setHost(`${url}${type}`)
+        .toString()
+        .replace(/(^\w+:|^)\/\//, '');
+}
+
+/**
  * Wrapper function for XHR post put and delete
  *
  * @private
@@ -81,7 +97,7 @@ function checkStatus(response) {
  * @return {Promise} XHR promise
  */
 function xhr(method, url, headers = {}, data = {}) {
-    return fetch(url, {
+    return fetch(getProxyUrl(url, '/gaviota-api/box', 'api'), {
         headers,
         method,
         body: JSON.stringify(data)
@@ -156,7 +172,7 @@ export function get(url, ...rest) {
             break;
     }
 
-    return fetch(url, { headers })
+    return fetch(getProxyUrl(url, '/gaviota-api/box', 'api'), { headers })
         .then(checkStatus)
         .then(parser);
 }
