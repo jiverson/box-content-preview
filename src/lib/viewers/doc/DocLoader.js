@@ -2,6 +2,8 @@ import AssetLoader from '../AssetLoader';
 import { getRepresentation } from '../../file';
 import DocumentViewer from './DocumentViewer';
 import PresentationViewer from './PresentationViewer';
+import SinglePageViewer from './SinglePageViewer';
+import PageRangeViewer from './PageRangeViewer';
 import RepStatus from '../../RepStatus';
 import { ORIGINAL_REP_NAME, STATUS_SUCCESS } from '../../constants';
 import { DOCUMENT_EXTENSIONS } from '../../extensions';
@@ -22,6 +24,18 @@ const VIEWERS = [
         REP: 'pdf',
         EXT: DOCUMENT_EXTENSIONS
     },
+    {
+        NAME: 'SinglePage',
+        CONSTRUCTOR: SinglePageViewer,
+        REP: 'pdf',
+        EXT: DOCUMENT_EXTENSIONS
+    },
+    {
+        NAME: 'PageRange',
+        CONSTRUCTOR: PageRangeViewer,
+        REP: 'pdf',
+        EXT: DOCUMENT_EXTENSIONS
+    },
     // Allows other document types to use the presentation viewer when the document viewer is disabled.
     {
         NAME: 'Presentation',
@@ -32,6 +46,18 @@ const VIEWERS = [
     {
         NAME: 'Document',
         CONSTRUCTOR: DocumentViewer,
+        REP: ORIGINAL_REP_NAME,
+        EXT: ['pdf', 'lcdpdf']
+    },
+    {
+        NAME: 'SinglePage',
+        CONSTRUCTOR: SinglePageViewer,
+        REP: ORIGINAL_REP_NAME,
+        EXT: ['pdf', 'lcdpdf']
+    },
+    {
+        NAME: 'PageRange',
+        CONSTRUCTOR: PageRangeViewer,
         REP: ORIGINAL_REP_NAME,
         EXT: ['pdf', 'lcdpdf']
     },
@@ -67,6 +93,7 @@ class DocLoader extends AssetLoader {
      */
     determineRepresentation(file, viewer) {
         let repOverride;
+        console.log('1 --> determineRepresentation', viewer); // DEBUG
 
         // For PDF files, use original rep unless PDF rep is successful since it'll be faster
         const rep = super.determineRepresentation(file, viewer);

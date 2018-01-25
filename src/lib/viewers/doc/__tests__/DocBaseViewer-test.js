@@ -738,11 +738,25 @@ describe('src/lib/viewers/doc/DocBaseViewer', () => {
             stubs.emit = sandbox.stub(docBase, 'emit');
         });
 
+        it('should call to get the pdfViewer', () => {
+            docBase.options.location = {
+                locale: 'en-US'
+            };
+
+            sandbox.spy(docBase, 'getPdfViewer');
+            sandbox.stub(PDFJS, 'getDocument').returns(Promise.resolve({}));
+
+            return docBase.initViewer('').then(() => {
+                expect(docBase.getPdfViewer).to.be.called;
+            });
+        });
+
         it('should turn on enhanced text selection if not on mobile', () => {
             docBase.options.location = {
                 locale: 'en-US'
             };
             docBase.isMobile = false;
+
             sandbox.stub(PDFJS, 'getDocument').returns(Promise.resolve({}));
 
             return docBase.initViewer('').then(() => {
@@ -853,6 +867,23 @@ describe('src/lib/viewers/doc/DocBaseViewer', () => {
                 expect(stubs.pdfViewer.setDocument).to.be.called;
                 expect(stubs.pdfViewer.linkService.setDocument).to.be.called;
             });
+        });
+    });
+
+    describe('getPdfViewer()', () => {
+        const pdfViewer = {
+            linkService: new PDFJS.PDFLinkService(),
+            setDocument: sandbox.stub(),
+            enhanceTextSelection: false
+        };
+
+        beforeEach(() => {
+            stubs.pdfViewerStub = sandbox.stub(PDFJS, 'PDFViewer').returns(pdfViewer);
+        });
+
+        it('should return the default pdfViewer', () => {
+            const result = docBase.getPdfViewer();
+            expect(result).to.equal(pdfViewer);
         });
     });
 

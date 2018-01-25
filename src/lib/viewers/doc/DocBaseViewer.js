@@ -496,12 +496,7 @@ class DocBaseViewer extends BaseViewer {
         this.bindDOMListeners();
 
         // Initialize pdf.js in container
-        this.pdfViewer = new PDFJS.PDFViewer({
-            container: this.docEl,
-            linkService: new PDFJS.PDFLinkService(),
-            // Enhanced text selection uses more memory, so disable on mobile
-            enhanceTextSelection: !this.isMobile
-        });
+        this.pdfViewer = this.getPdfViewer();
 
         // Use chunk size set in viewer options if available
         let rangeChunkSize = this.getViewerOption('rangeChunkSize');
@@ -534,16 +529,10 @@ class DocBaseViewer extends BaseViewer {
         this.pdfLoadingTask = PDFJS.getDocument(docInitParams);
         return this.pdfLoadingTask
             .then((doc) => {
-
-
-                Object.defineProperty(doc, 'numPages', { value: Math.min(doc.numPages, 3) });
+                // Object.defineProperty(doc, 'numPages', { value: Math.min(doc.numPages, 3) });
                 this.pdfViewer.setDocument(doc);
 
-                console.log(doc);
-                // console.log(docInitParams);
-
                 const { linkService } = this.pdfViewer;
-                console.log(linkService)
                 if (linkService instanceof PDFJS.PDFLinkService) {
                     linkService.setDocument(doc, pdfUrl);
                     linkService.setViewer(this.pdfViewer);
@@ -553,7 +542,7 @@ class DocBaseViewer extends BaseViewer {
                 /* eslint-disable no-console */
                 console.error(err);
                 /* eslint-enable no-console */
-    
+
                 // Display a generic error message but log the real one
                 const error = err;
                 if (error instanceof Error) {
@@ -562,6 +551,22 @@ class DocBaseViewer extends BaseViewer {
 
                 this.triggerError(error);
             });
+    }
+
+    /**
+     * Get pdf.js viewer.
+     *
+     * @protected
+     * @override
+     * @return {PDFJS.PDFViewer}
+     */
+    getPdfViewer() {
+        return new PDFJS.PDFViewer({
+            container: this.docEl,
+            linkService: new PDFJS.PDFLinkService(),
+            // Enhanced text selection uses more memory, so disable on mobile
+            enhanceTextSelection: !this.isMobile
+        });
     }
 
     /**
