@@ -23,23 +23,9 @@ class SinglePageViewer extends DocumentViewer {
         }
 
         this.pdfLoadingTask = PDFJS.getDocument(docInitParams);
-        return this.pdfLoadingTask.then((doc) => {
-            return doc
-                .getPage(pageRange)
-                .then(() => {
-                    // Set the number of pages to 1 and replace the pages promise to the one you load
-                    Object.defineProperty(doc, 'numPages', { value: 1 });
-                    Object.defineProperty(doc.transport, 'pagePromises', {
-                        value: doc.transport.pagePromises.slice(pageRange - 1)
-                    });
-
-                    this.pdfViewer.setDocument(doc);
-                    this.initLinkService(doc, url);
-                })
-                .catch((err) => {
-                    this.triggerError(err);
-                });
-        });
+        return this.pdfLoadingTask.then((doc) =>
+            this.fetchPage(doc, url, pageRange).catch((err) => this.triggerError(err))
+        );
     }
 
     /**
@@ -55,6 +41,32 @@ class SinglePageViewer extends DocumentViewer {
             linkService: new PDFJS.PDFLinkService(),
             // Enhanced text selection uses more memory, so disable on mobile
             enhanceTextSelection: !this.isMobile
+        });
+    }
+
+    //--------------------------------------------------------------------------
+    // Private
+    //--------------------------------------------------------------------------
+    /**
+     * Get individual page from document.
+     *
+     * @protected
+     * @param {Object} doc - The params to pass to pdfjs
+     * @param {string} url - The url to pass to link service
+     * @param {Object} pageRange - The page number to fetch
+     * @override
+     * @return {Promise} Promise to get page
+     */
+    fetchPage(doc, url, pageRange) {
+        return doc.getPage(pageRange).then(() => {
+            // Set the number of pages to 1 and replace the pages promise to the one you load
+            Object.defineProperty(doc, 'numPages', { value: 1 });
+            Object.defineProperty(doc.transport, 'pagePromises', {
+                value: doc.transport.pagePromises.slice(pageRange - 1)
+            });
+
+            this.pdfViewer.setDocument(doc);
+            this.initLinkService(doc, url);
         });
     }
 }
