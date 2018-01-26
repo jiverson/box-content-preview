@@ -243,6 +243,28 @@ class DocBaseViewer extends BaseViewer {
     }
 
     /**
+     * Emits error event with refresh message.
+     *
+     * @protected
+     * @emits error
+     * @param {Error|string} [err] - Optional error or string with message
+     * @return {void}
+     */
+    triggerError(err) {
+        /* eslint-disable no-console */
+        console.error(err);
+        /* eslint-enable no-console */
+
+        // Display a generic error message but log the real one
+        const error = err;
+        if (error instanceof Error) {
+            error.displayMessage = __('error_document');
+        }
+
+        super.triggerError(error);
+    }
+
+    /**
      * Loads a document after assets and representation are ready.
      *
      * @return {void}
@@ -525,32 +547,45 @@ class DocBaseViewer extends BaseViewer {
             };
         }
 
-        // Load PDF from representation URL and set as document for pdf.js. Cache
-        // the loading task so we can cancel if needed
+        return this.initLoadingTask(docInitParams);
+    }
+
+    /**
+     * Load PDF from representation URL and set as document for pdf.js. Cache
+     * the loading task so we can cancel if needed
+     *
+     * @protected
+     * @param {Object} docInitParams - The params to pass to pdfjs
+     * @return {Promise} Promise to initialize Viewer
+     */
+    initLoadingTask(docInitParams) {
+        const { url } = docInitParams;
+
         this.pdfLoadingTask = PDFJS.getDocument(docInitParams);
         return this.pdfLoadingTask
             .then((doc) => {
                 this.pdfViewer.setDocument(doc);
-
-                const { linkService } = this.pdfViewer;
-                if (linkService instanceof PDFJS.PDFLinkService) {
-                    linkService.setDocument(doc, pdfUrl);
-                    linkService.setViewer(this.pdfViewer);
-                }
+                this.initLinkService(doc, url);
             })
             .catch((err) => {
-                /* eslint-disable no-console */
-                console.error(err);
-                /* eslint-enable no-console */
-
-                // Display a generic error message but log the real one
-                const error = err;
-                if (error instanceof Error) {
-                    error.displayMessage = __('error_document');
-                }
-
-                this.triggerError(error);
+                this.triggerError(err);
             });
+    }
+
+    /**
+     * Initial link service if available
+     *
+     * @protected
+     * @param {Object} doc - Pdfjs document
+     * @param {string} url - Link service url
+     * @return {void}
+     */
+    initLinkService(doc, url) {
+        const { linkService } = this.pdfViewer;
+        if (linkService instanceof PDFJS.PDFLinkService) {
+            linkService.setDocument(doc, url);
+            linkService.setViewer(this.pdfViewer);
+        }
     }
 
     /**
